@@ -1,0 +1,20 @@
+description: Docker container with argocd, yq, git and ssh for updating bootstrap repository
+
+parameters:
+  image:
+    type: string
+    default: labzh/cimg-argocd:v0.0.1
+
+  resource_class:
+    type: enum
+    enum: [ "medium", "large", "xlarge", "2xlarge", "arm.medium", "arm.large", "arm.xlarge", "arm.2xlarge" ]
+    default: medium
+    description: Resource class.
+
+docker:
+  - image: << parameters.image >>
+    auth:
+      username: _json_key
+      password: ${GCP_GCR_SERVICE_ACCOUNT_TOKEN}
+
+resource_class: << parameters.resource_class >>

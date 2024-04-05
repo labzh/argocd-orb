@@ -1,0 +1,93 @@
+description: Add deployment status to an existing deployment.
+parameters:
+  environment:
+    type: string
+    default: $ENVIRONMENT_NAME
+  organisation:
+    type: string
+    default: $CIRCLE_PROJECT_USERNAME
+  repository:
+    type: string
+    default: $CIRCLE_PROJECT_REPONAME
+  client_id:
+    type: string
+    default: $GITHUB_APP_CLIENT_ID
+  description:
+    type: string
+    default: ""
+  auto_inactive:
+    type: boolean
+    default: false
+  deployment_id:
+    type: string
+    default: $DEPLOYMENT_ID
+  environment_url:
+    type: string
+    default: ""
+  final_state:
+    type: boolean
+    default: false
+    description: Use this flag to detect status of previous job (typically the actual deployment) and set the final state to failure or success accordingly
+  log_url:
+    type: string
+    default: $CIRCLE_BUILD_URL
+  state:
+    type: string #[error, failure, inactive, in_progress, queued, pending, success]
+    default: pending
+  api_version:
+    type: string
+    default: 2022-11-28
+steps:
+  - run:
+      when: on_fail
+      name: "Github: update deployment status to 'failure'"
+      environment:
+        DEPLOY_STATUS: failure
+        ENVIRONMENT: << parameters.environment >>
+        ORGANISATION: << parameters.organisation >>
+        REPOSITORY: << parameters.repository >>
+        CLIENT_ID: << parameters.client_id >>
+        DESCRIPTION: << parameters.description >>
+        AUTO_INACTIVE: << parameters.auto_inactive >>
+        ENVIRONMENT_URL: << parameters.environment_url >>
+        DEPLOYMENT_ID: << parameters.deployment_id >>
+        LOGO_URL: << parameters.log_url >>
+        API_VERSION: << parameters.api_version >>
+      command: << include(scripts/github-deployment-update.sh) >>
+  - when:
+      condition:
+        equal: [ true, <<parameters.final_state>> ]
+      steps:
+        - run:
+            when: on_success
+            name: "Github: update deployment status to 'success'"
+            environment:
+              DEPLOY_STATUS: success
+              ENVIRONMENT: << parameters.environment >>
+              ORGANISATION: << parameters.organisation >>
+              REPOSITORY: << parameters.repository >>
+              CLIENT_ID: << parameters.client_id >>
+              DESCRIPTION: << parameters.description >>
+              AUTO_INACTIVE: << parameters.auto_inactive >>
+              ENVIRONMENT_URL: << parameters.environment_url >>
+              DEPLOYMENT_ID: << parameters.deployment_id >>
+              LOGO_URL: << parameters.log_url >>
+            command: << include(scripts/github-deployment-update.sh) >>
+  - when:
+      condition:
+        not: <<parameters.final_state>>
+      steps:
+        - run:
+            name: "Github: update deployment status to '<<parameters.state>>'"
+            environment:
+              DEPLOY_STATUS: <<parameters.state>>
+              ENVIRONMENT: << parameters.environment >>
+              ORGANISATION: << parameters.organisation >>
+              REPOSITORY: << parameters.repository >>
+              CLIENT_ID: << parameters.client_id >>
+              DESCRIPTION: << parameters.description >>
+              AUTO_INACTIVE: << parameters.auto_inactive >>
+              ENVIRONMENT_URL: << parameters.environment_url >>
+              DEPLOYMENT_ID: << parameters.deployment_id >>
+              LOGO_URL: << parameters.log_url >>
+            command: << include(scripts/github-deployment-update.sh) >>

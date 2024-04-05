@@ -1,0 +1,39 @@
+description: Add deployment status to a Github repository.
+parameters:
+  environment:
+    type: string
+    default: $ENVIRONMENT_NAME
+  organisation:
+    type: string
+    default: $CIRCLE_PROJECT_USERNAME
+  repository:
+    type: string
+    default: $CIRCLE_PROJECT_REPONAME
+  client_id:
+    type: string
+    default: $GITHUB_APP_CLIENT_ID
+  api_version:
+    type: string
+    default: 2022-11-28
+  reference:
+    type: string
+    default: ""
+  auto_merge:
+    type: string
+    default: "false"
+  required_contexts:
+    type: string
+    default: '[]'
+steps:
+  - run:
+      name: 'Github: create deployment'
+      environment:
+        ENVIRONMENT: << parameters.environment >>
+        ORGANISATION: << parameters.organisation >>
+        CLIENT_ID: << parameters.client_id >>
+        REPOSITORY: << parameters.repository >>
+        REFERENCE: << parameters.reference >>
+        AUTO_MERGE: << parameters.auto_merge >>
+        REQUIRED_CONTEXTS: << parameters.required_contexts >>
+        API_VERSION: << parameters.api_version >>
+      command: << include(scripts/github-deployment-create.sh) >>

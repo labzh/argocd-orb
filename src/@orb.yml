@@ -1,0 +1,12 @@
+version: 2.1
+
+description: |
+  CircleCI orb to deploy services on Github with ArgoCD
+  Get support on Github: https://github.com/labzh/argocd-orb/issues
+display:
+  home_url: "https://github.com/labzh/argocd-orb"
+  source_url: "https://github.com/labzh/argocd-orb"
+
+orbs:
+  docker: circleci/docker@2.5.0
+

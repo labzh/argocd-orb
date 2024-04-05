@@ -1,0 +1,60 @@
+description: docker build and push job
+
+executor: <<parameters.executor>>
+
+parameters:
+  image:
+    type: string
+    default: $CIRCLE_PROJECT_REPONAME
+  registry:
+    type: string
+    default: $DOCKER_REGISTRY
+  docker_context:
+    type: string
+    default: .
+  path:
+    type: string
+    default: .
+  dockerfile:
+    type: string
+    default: Dockerfile
+  extra_build_args:
+    type: string
+    default: ""
+  username:
+    type: string
+    default: DOCKER_LOGIN
+  password:
+    type: string
+    default: DOCKER_PASSWORD
+  tag:
+    type: string
+    default: $CIRCLE_SHA1
+  attach_at:
+    type: string
+    default: ""
+  executor:
+    type: executor
+    default: machine
+    description: >
+      Executor to use for this job, defaults to this orb's `machine` executor
+
+steps:
+  - checkout
+  - docker/check:
+      docker-username: << parameters.username >>
+      docker-password: << parameters.password >>
+      registry: << parameters.registry >>
+  - docker/build:
+      image: << parameters.image >>
+      tag: << parameters.tag >>
+      dockerfile: << parameters.dockerfile >>
+      docker-context: << parameters.docker_context >>
+      path: << parameters.path >>
+      registry: << parameters.registry >>
+      extra_build_args: << parameters.extra_build_args >>
+      attach-at: << parameters.attach_at >>
+  - docker/push:
+      image: << parameters.image >>
+      tag: << parameters.tag >>
+      registry: << parameters.registry >>

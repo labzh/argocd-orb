@@ -1,0 +1,136 @@
+description: deployment job
+
+executor: argocd
+
+parameters:
+  app_name:
+    type: string
+    default: $CIRCLE_PROJECT_REPONAME
+  environment:
+    type: string
+    default: $ENVIRONMENT_NAME
+  regions:
+    type: string
+    default: $REGIONS_LIST
+  image_tag:
+    type: string
+    default: $CIRCLE_SHA1
+  argocd_domain:
+    type: string
+    default: $ARGOCD_DOMAIN
+  argocd_token:
+    type: string
+    default: $ARGOCD_TOKEN
+  argocd_bootstrap_organization:
+    type: string
+    default: $CIRCLE_PROJECT_USERNAME
+  argocd_bootstrap_repository:
+    type: string
+    default: $ARGOCD_BOOTSTRAP_REPOSITORY
+  argocd_bootstrap_chart_path:
+    type: string
+    default: charts
+  argocd_bootstrap_values_file:
+    type: string
+    default: $ARGOCD_BOOTSTRAP_VALUES_FILE
+  argocd_bootstrap_app_name:
+    type: string
+    default: $ARGOCD_BOOTSTRAP_APP_NAME
+  argocd_bootstrap_chart_name:
+    type: string
+    default: ""
+  argocd_bootstrap_branch:
+    type: string
+    default: main
+  argocd_timeout:
+    type: integer
+    default: 900 # 15 minutes
+  argocd_repository_protocol:
+    type: string
+    default: $ARGOCD_REPOSITORY_PROTOCOL
+  helm_repository:
+    type: boolean
+    default: true
+  helm_target_revision:
+    type: string
+    default: HEAD
+  helm_chart_path:
+    type: string
+    default: charts
+  helm_values_files:
+    type: string
+    default: ""
+  github_api_version:
+    type: string
+    default: "2022-11-28"
+  resource_class:
+    type: string
+    default: small
+
+steps:
+  - run:
+      name: 'Github: generate token'
+      environment:
+        ORGANISATION: $CIRCLE_PROJECT_USERNAME
+        API_VERSION: << parameters.github_api_version >>
+      command: << include(scripts/github-token-generate.sh) >>
+  - github_create_deployment:
+      environment: << parameters.environment >>
+      reference: << parameters.image_tag >>
+      api_version: << parameters.github_api_version >>
+  - github_update_deployment:
+      environment: << parameters.environment >>
+      description: << parameters.image_tag >>
+      auto_inactive: true
+      state: in_progress
+      api_version: << parameters.github_api_version >>
+  - run:
+      name: 'Github: generate token'
+      environment:
+        ORGANISATION: << parameters.argocd_bootstrap_organization >>
+        API_VERSION: << parameters.github_api_version >>
+      command: << include(scripts/github-token-generate.sh) >>
+  - run:
+      name: 'ArgoCD: update the bootstrap app'
+      environment:
+        APP_NAME: << parameters.app_name >>
+        ENVIRONMENT: << parameters.environment >>
+        ORGANISATION: << parameters.argocd_bootstrap_organization >>
+        BOOTSTRAP_HELM_CHART_PATH: << parameters.argocd_bootstrap_chart_path >>
+        BOOTSTRAP_VALUES_FILE: << parameters.argocd_bootstrap_values_file >>
+        BOOTSTRAP_APP_NAME: << parameters.argocd_bootstrap_app_name >>
+        BOOTSTRAP_CHART_NAME: << parameters.argocd_bootstrap_chart_name >>
+        REPOSITORY: << parameters.argocd_bootstrap_repository >>
+        REPOSITORY_PROTOCOL: << parameters.argocd_repository_protocol >>
+        HELM_REPOSITORY: << parameters.helm_repository >>
+        HELM_TARGET_REVISION: << parameters.helm_target_revision >>
+        HELM_CHART_PATH: << parameters.helm_chart_path >>
+        HELM_VALUES_FILES: << parameters.helm_values_files >>
+        DEFAULT_BRANCH: << parameters.argocd_bootstrap_branch >>
+        IMAGE_TAG: << parameters.image_tag >>
+        REGIONS: << parameters.regions >>
+        GITHUB_API_VERSION: << parameters.github_api_version >>
+      command: << include(scripts/argocd-bootstrap-update.sh) >>
+  - run:
+      name: 'ArgoCD: deploy'
+      no_output_timeout: 15m
+      environment:
+        BOOTSTRAP_APP_NAME: << parameters.argocd_bootstrap_app_name >>
+        SERVER: << parameters.argocd_domain >>
+        APP_NAME: << parameters.app_name >>
+        REGIONS: << parameters.regions >>
+        TOKEN: << parameters.argocd_token >>
+      command: << include(scripts/argocd-applications-deploy.sh) >>
+  - run:
+      when: always
+      name: 'Github: generate token'
+      environment:
+        ORGANISATION: $CIRCLE_PROJECT_USERNAME
+        API_VERSION: << parameters.github_api_version >>
+      command: << include(scripts/github-token-generate.sh) >>
+  - github_update_deployment:
+      auto_inactive: true
+      description: << parameters.image_tag >>
+      environment: << parameters.environment >>
+      final_state: true
+      api_version: << parameters.github_api_version >>

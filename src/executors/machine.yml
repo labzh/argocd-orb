@@ -1,0 +1,25 @@
+description: >
+  CircleCI's Ubuntu-based machine executor VM:
+  https://circleci.com/docs/2.0/executor-types/#using-machine
+
+parameters:
+  image:
+    type: string
+    default: ubuntu-2204:current
+
+  dlc:
+    type: boolean
+    default: false
+    description: Enable Docker Layer Caching?
+
+  resource_class:
+    type: enum
+    enum: [ "medium", "large", "xlarge", "2xlarge", "arm.medium", "arm.large", "arm.xlarge", "arm.2xlarge" ]
+    default: medium
+    description: Resource class.
+
+machine:
+  image: <<parameters.image>>
+  docker_layer_caching: <<parameters.dlc>>
+
+resource_class: <<parameters.resource_class>>
