@@ -1,5 +1,5 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'labzh/cimg-argocd:$TAG_NAME', '--build-arg', 'image_to_build=argocd', 'docker']
-images: ['labzh/cimg-argocd:$TAG_NAME']
+    args: ['build', '-t', 'jderuere/cimg-argocd:$TAG_NAME', '--build-arg', 'image_to_build=argocd', 'docker']
+images: ['jderuere/cimg-argocd:$TAG_NAME']
 timeout: 1800s
