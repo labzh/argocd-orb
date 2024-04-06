@@ -11,3 +11,6 @@ availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_ID/secrets/docker-hub-password/versions/latest
       env: 'PASSWORD'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
