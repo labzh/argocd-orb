@@ -2,8 +2,8 @@ version: 2.1
 setup: true
 
 orbs:
-  orb-tools: circleci/orb-tools@12.0
-  shellcheck: circleci/shellcheck@3.1
+  orb-tools: circleci/orb-tools@12.1.0
+  shellcheck: circleci/shellcheck@3.2.0
 
 filters: &filters
   tags:
@@ -22,7 +22,7 @@ workflows:
           filters: *filters
       - orb-tools/publish:
           vcs_type: << pipeline.project.type >>
-          orb_name: lightspeed/cd
+          orb_name: labzh/cd
           requires:
             [
               orb-tools/lint,
@@ -35,6 +35,6 @@ workflows:
       - orb-tools/continue:
           pipeline_number: << pipeline.number >>
           vcs_type: << pipeline.project.type >>
-          orb_name: lightspeed/cd
+          orb_name: labzh/cd
           requires: [ orb-tools/publish ]
           filters: *filters
