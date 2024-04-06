@@ -6,8 +6,8 @@ description: >
 usage:
   version: 2.1
   orbs:
-    ls-cd: lightspeed/cd@1.2.3
+    cd: labzh/cd@1.2.3
   workflows:
-    use-my-orb:
+    deployment-pipeline:
       jobs:
-        - ls-cd/deploy
+        - cd/deploy
