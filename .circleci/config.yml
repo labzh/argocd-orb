@@ -21,7 +21,7 @@ workflows:
       - shellcheck/check:
           filters: *filters
       - orb-tools/publish:
-          vcs_type: << pipeline.project.type >>
+          vcs_type: github
           orb_name: labzh/cd
           requires:
             [
