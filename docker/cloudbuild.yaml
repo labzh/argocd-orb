@@ -1,6 +1,7 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'login', '--username=jderuere', '--password=$$PASSWORD' ]
+    entrypoint: bash
+    args: [ '-c', 'docker login --username=jderuere --password=$$PASSWORD' ]
     secretEnv: [ 'PASSWORD' ]
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'build', '-t', 'jderuere/cimg-argocd:$TAG_NAME', '--build-arg', 'image_to_build=argocd', 'docker' ]
