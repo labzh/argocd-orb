@@ -20,7 +20,7 @@ workflows:
       - shellcheck/check:
           filters: *filters
       - orb-tools/publish:
-          vcs_type: << pipeline.project.type >>
+          vcs_type: github
           orb_name: labzh/cd
           requires:
             [
@@ -33,7 +33,7 @@ workflows:
       # Triggers the next workflow in the Orb Development Kit.
       - orb-tools/continue:
           pipeline_number: << pipeline.number >>
-          vcs_type: << pipeline.project.type >>
+          vcs_type: github
           orb_name: labzh/cd
           requires: [ orb-tools/publish ]
           filters: *filters
