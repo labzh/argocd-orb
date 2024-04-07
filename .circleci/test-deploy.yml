@@ -41,7 +41,7 @@ workflows:
           filters: *release-filters
       - orb-tools/publish:
           orb_name: labzh/cd
-          vcs_type: github
+          vcs_type: << pipeline.project.type >>
           pub_type: production
           # Ensure this job requires all test jobs and the pack job.
           requires:

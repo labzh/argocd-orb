@@ -1,9 +1,8 @@
 version: 2.1
 setup: true
-
 orbs:
   orb-tools: circleci/orb-tools@12.0
-  shellcheck: circleci/shellcheck@3.2.0
+  shellcheck: circleci/shellcheck@3.1
 
 filters: &filters
   tags:
@@ -21,7 +20,7 @@ workflows:
       - shellcheck/check:
           filters: *filters
       - orb-tools/publish:
-          vcs_type: github
+          vcs_type: << pipeline.project.type >>
           orb_name: labzh/cd
           requires:
             [
@@ -34,7 +33,7 @@ workflows:
       # Triggers the next workflow in the Orb Development Kit.
       - orb-tools/continue:
           pipeline_number: << pipeline.number >>
-          vcs_type: github
+          vcs_type: << pipeline.project.type >>
           orb_name: labzh/cd
           requires: [ orb-tools/publish ]
           filters: *filters

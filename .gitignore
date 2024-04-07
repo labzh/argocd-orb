@@ -2,4 +2,4 @@
 orb.yml
 .DS_Store
 
-lightspeed-cd.iml
+*.iml
