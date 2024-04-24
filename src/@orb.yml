@@ -8,5 +8,5 @@ display:
   source_url: "https://github.com/labzh/argocd-orb"
 
 orbs:
-  docker: circleci/docker@2.5.0
+  docker: circleci/docker@2.6.0
 
