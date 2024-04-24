@@ -13,8 +13,5 @@ parameters:
 
 docker:
   - image: << parameters.image >>
-    auth:
-      username: _json_key
-      password: ${GCP_GCR_SERVICE_ACCOUNT_TOKEN}
 
 resource_class: << parameters.resource_class >>
