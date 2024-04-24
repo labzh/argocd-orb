@@ -3,7 +3,7 @@ description: Docker container with argocd, yq, git and ssh for updating bootstra
 parameters:
   image:
     type: string
-    default: jderuere/cimg-argocd:1.0.0
+    default: jderuere/cimg-argocd:1.0.1
 
   resource_class:
     type: enum
